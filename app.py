@@ -3,32 +3,16 @@ from transformers import pipeline
 
 
 @st.cache_resource
-def load_model():
-    return pipeline(
-        "text-classification",
-        model="j-hartmann/emotion-english-distilroberta-base"
-    )
+def load():
+    return pipeline("sentiment-analysis")
 
 
-emotion_classifier = load_model()
+st.title("Sentiment Analyzer")
 
-st.title("Words That Find You")
+txt = st.text_area("Your text:")
 
-st.write("Tell me what's on your mind.")
+if st.button("Analyze") and txt.strip():
+    r = load()(txt)[0]
 
-text = st.text_area("How are you feeling?")
-
-if st.button("Find My Words"):
-    if text:
-        result = emotion_classifier(text)[0]
-
-        emotion = result["label"]
-        confidence = result["score"]
-
-        st.subheader("I think you're feeling...")
-
-        st.write(f"**Emotion:** {emotion}")
-        st.write(f"**Confidence:** {confidence:.2%}")
-
-    else:
-        st.warning("Please tell me what's on your mind first.")
+    st.subheader(r["label"])
+    st.write(f"Confidence: {r['score']:.1%}")
